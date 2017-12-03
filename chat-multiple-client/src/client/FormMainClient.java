@@ -190,7 +190,7 @@ public class FormMainClient extends javax.swing.JFrame {
                 try {
                     address = InetAddress.getLocalHost();
                     System.out.println(address);
-                    sk = new Socket(address, 6969);
+                    sk = new Socket("192.168.1.107", 6969);
                     is = new BufferedReader(new InputStreamReader(sk.getInputStream()));
                     os = new PrintWriter(sk.getOutputStream());
                     

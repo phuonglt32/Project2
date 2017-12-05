@@ -75,17 +75,35 @@ public class FormMainClient extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         lblAvatar = new javax.swing.JLabel();
+        lblFullname = new javax.swing.JLabel();
         lblUser = new javax.swing.JLabel();
+        lblUser1 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         txtAddFriend = new javax.swing.JTextField();
         btnAddFriend = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("DHCP-chat");
 
         lblAvatar.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
+        lblAvatar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
+
+        lblFullname.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
+        lblFullname.setText("fullname");
 
         lblUser.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
         lblUser.setText("user");
+
+        lblUser1.setFont(new java.awt.Font("Dialog", 2, 14)); // NOI18N
+        lblUser1.setText("Hôm nay bạn thế nào ?");
+
+        jTextField1.setText("Trâtss");
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -93,18 +111,29 @@ public class FormMainClient extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblUser, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblFullname, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                    .addComponent(lblUser, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                    .addComponent(jTextField1)
+                    .addComponent(lblUser1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblFullname)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblUser1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -166,7 +195,7 @@ public class FormMainClient extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -190,7 +219,7 @@ public class FormMainClient extends javax.swing.JFrame {
                 try {
                     address = InetAddress.getLocalHost();
                     System.out.println(address);
-                    sk = new Socket("192.168.1.107", 6969);
+                    sk = new Socket("192.168.1.97", 6969);
                     is = new BufferedReader(new InputStreamReader(sk.getInputStream()));
                     os = new PrintWriter(sk.getOutputStream());
                     
@@ -225,12 +254,24 @@ public class FormMainClient extends javax.swing.JFrame {
                             // server báo login thất bại
                             if (!rq.isLogin()) {
                                 formlogin.throwMessage();
-                                System.out.println("login that bai: " + rq.isLogin());
+                                System.out.println("login that bai");
                             } else {
 
                                 // server báo login thành công
                                 System.out.println("login thanh cong");
-//                                lblAvatar.setIcon(FileConverter.stringToImage(rq.getAvatar()));
+                                
+                                // Đặt avatar có ảnh thì lấy ko thì lấy ảnh mặc định
+                                if (rq.getAvatar() != null && !rq.getAvatar().isEmpty()) {
+                                    lblAvatar.setIcon(FileConverter.stringToImage(rq.getAvatar()));
+                                } else {
+                                    lblAvatar.setIcon(new ImageIcon("images/avatar-100.jpg"));
+                                }
+                                
+                                // Đặt fullname & username
+                                if (user != null) {
+                                    lblUser.setText(user);
+                                }
+                                
                                 showForm();
                                 formlogin.setVisible(false);
                             }
@@ -287,6 +328,10 @@ public class FormMainClient extends javax.swing.JFrame {
         this.friends.add(new FriendEntry("huong ly", true));
         addListFriend();
     }//GEN-LAST:event_btnAddFriendActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     public void exit() {
         System.exit(0);
@@ -352,8 +397,11 @@ public class FormMainClient extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblAvatar;
+    private javax.swing.JLabel lblFullname;
     private javax.swing.JLabel lblUser;
+    private javax.swing.JLabel lblUser1;
     private javax.swing.JTextField txtAddFriend;
     // End of variables declaration//GEN-END:variables
 }

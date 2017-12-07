@@ -12,10 +12,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -24,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.UnsupportedLookAndFeelException;
 import request.FileConverter;
@@ -59,7 +62,7 @@ public class FormMainClient extends javax.swing.JFrame {
         this.friends.add(new FriendEntry("hieu", false));
         this.friends.add(new FriendEntry("phuong", false));
         addListFriend();
-        
+
         backgroundThread();
     }
 
@@ -83,8 +86,13 @@ public class FormMainClient extends javax.swing.JFrame {
         txtAddFriend = new javax.swing.JTextField();
         btnAddFriend = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("DHCP-chat");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         lblAvatar.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
         lblAvatar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
@@ -215,22 +223,22 @@ public class FormMainClient extends javax.swing.JFrame {
                 InetAddress address = null;
                 Socket sk = null;
                 BufferedReader is = null;
-                
+
                 try {
                     address = InetAddress.getLocalHost();
                     System.out.println(address);
                     sk = new Socket("192.168.1.97", 6969);
                     is = new BufferedReader(new InputStreamReader(sk.getInputStream()));
                     os = new PrintWriter(sk.getOutputStream());
-                    
+
                     UUID randomUUID = UUID.randomUUID();
-                    id = randomUUID.toString();           
-                    
+                    id = randomUUID.toString();
+
                     // Ngay khi kết nối đến server, gửi luôn id
                     Request rqLogin = new Request();
                     rqLogin.id = id;
                     String jsonLogin = gson.toJson(rqLogin);
-                    
+
                     os.println(jsonLogin);
                     os.flush();
 
@@ -259,19 +267,19 @@ public class FormMainClient extends javax.swing.JFrame {
 
                                 // server báo login thành công
                                 System.out.println("login thanh cong");
-                                
+
                                 // Đặt avatar có ảnh thì lấy ko thì lấy ảnh mặc định
                                 if (rq.getAvatar() != null && !rq.getAvatar().isEmpty()) {
                                     lblAvatar.setIcon(FileConverter.stringToImage(rq.getAvatar()));
                                 } else {
                                     lblAvatar.setIcon(new ImageIcon("images/avatar-100.jpg"));
                                 }
-                                
+
                                 // Đặt fullname & username
                                 if (user != null) {
                                     lblUser.setText(user);
                                 }
-                                
+
                                 showForm();
                                 formlogin.setVisible(false);
                             }
@@ -333,10 +341,35 @@ public class FormMainClient extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+//        javax.swing.UIManager.put("OptionPane.font", new Font("Arial", Font.BOLD, 30));
+//        int confirmed = JOptionPane.showConfirmDialog(null,
+//                "Bạn muốn thoát ?", "Exit",
+//                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+//
+//        if (confirmed == JOptionPane.YES_OPTION) {
+//            System.exit(0);
+//        }
+
+        // Tạo nội dung câu hỏi
+        ArrayList<String> listText = new ArrayList<>();
+        listText.add("Bạn có thực sự muốn thoát ?");
+        listText.add("Bạn sẽ không thể gửi & nhận tin nhắn");
+        
+        new FormConfirm(this, listText, new Callable() {
+            @Override
+            public Object call() throws Exception {
+                System.exit(0);
+                return null;
+            }
+        });
+    }//GEN-LAST:event_formWindowClosing
+
     public void exit() {
         System.exit(0);
     }
-
+    
     public void showForm() {
         setVisible(true);
         setLocationRelativeTo(null);
